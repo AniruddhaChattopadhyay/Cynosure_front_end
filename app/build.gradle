@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/DEPENDENCIES'
+    }
 }
 
 repositories {
@@ -30,6 +34,10 @@ dependencies {
     implementation 'com.google.maps:google-maps-services:0.9.4'
     implementation 'org.slf4j:slf4j-simple:1.7.25'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    implementation 'com.google.firebase:firebase-ml-natural-language:20.0.2'
+    implementation 'com.google.cloud:google-cloud-translate:1.85.0'
+    implementation 'com.google.firebase:firebase-ml-vision:22.0.0'
     implementation 'com.google.firebase:firebase-core:17.0.1'
     implementation 'com.google.firebase:firebase-database:18.0.1'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
