@@ -14,6 +14,7 @@ import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationListener;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -46,7 +47,8 @@ import com.google.firebase.database.FirebaseDatabase;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
 
@@ -89,11 +91,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     startLocationUpdates();
                     displayLocation();
 
+
                 }
             }
         });
-
-
 
         drivers = FirebaseDatabase.getInstance().getReference("Drivers");
         geoFire = new GeoFire(drivers);
@@ -104,6 +105,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setupLocation();
     }
 
+    public void onInfoWindowClick(Marker arg0){
+        String url = "https://www.google.com";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+    }
 
 
     @Override
@@ -200,9 +207,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.d("KANISHKA","mCurrent");
                     mCurrent = mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude,longitude))
+                            .snippet("WB041004")
                             .title("You"));
+                    mCurrent.setTag(0);
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
-                    rotateMarker(mCurrent,-360,mMap);
+
                 }
             });
         }
@@ -264,7 +273,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
+
+
+//        Add a marker in Sydney and move the camera
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
@@ -293,5 +306,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        if ( (Integer) marker.getTag()%2 == 0){
+            int tag = (Integer) marker.getTag();
+            tag = tag +1;
+            marker.setTag(tag);
+            Log.d("KANISHKA", "Marker Tag  :  " + tag);
+        }
+        else {
+            int tag = (Integer) marker.getTag();
+            tag = tag +1;
+            marker.setTag(tag);
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("NAME",marker.getTitle());
+            intent.putExtra("POSITION",marker.getPosition());
+            intent.putExtra("NUMBER", marker.getSnippet());
+            startActivity(intent);}
+        return false;
     }
 }

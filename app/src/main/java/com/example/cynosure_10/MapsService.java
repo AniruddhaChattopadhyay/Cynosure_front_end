@@ -1,10 +1,16 @@
 package com.example.cynosure_10;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,6 +23,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -43,6 +50,7 @@ public class MapsService extends Service implements
 
     private GoogleMap mMap;
 
+
     private static final int MY_PERMISSION_REQUEST = 7000;
     private static final int PLAY_SERVICE_REQUEST = 7001;
 
@@ -53,6 +61,7 @@ public class MapsService extends Service implements
     private static int UPDATE_INTERVAL = 300;
     private static int FASTEST_INTERVAL = 100;
     private static int DISPLACEMENT = 1;
+    private int NOTIFICATION_ID = 1337;
 
     DatabaseReference drivers;
     GeoFire geoFire;
@@ -62,14 +71,19 @@ public class MapsService extends Service implements
 
     public MapsService() {
 
+    }
+
+    @Override
+    public void onCreate() {
+        startInForeground();
+
         drivers = FirebaseDatabase.getInstance().getReference("Test");
         geoFire = new GeoFire(drivers);
 
         String id = drivers.push().getKey();
-        Log.d("KANISHKA","ID:  " + id);
+        Log.d("KANISHKA","OnCreate");
 
         setupLocation();
-
     }
 
     @Override
@@ -169,25 +183,12 @@ public class MapsService extends Service implements
             final double latitude = mLastLocation.getLatitude();
             final double longitude = mLastLocation.getLongitude();
 
-            if(mCurrent != null)
-                mCurrent.remove();
-            Log.d("KANISHKA","mCurrent");
-            mCurrent = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude,longitude))
-                    .title("You"));
-            Log.d("KANISHKA","Location = "+ latitude + "   "+ longitude);
+            Log.d("KANISHKA","Location Service = "+ latitude + "   "+ longitude);
             //Updating to Firebase
             geoFire.setLocation("You", new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
                 @Override
                 public void onComplete(String key, DatabaseError error) {
-                    if(mCurrent != null)
-                        mCurrent.remove();
-                    Log.d("KANISHKA","mCurrent");
-                    mCurrent = mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latitude,longitude))
-                            .title("You"));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
-                    rotateMarker(mCurrent,-360,mMap);
+
                 }
             });
         }
@@ -232,6 +233,22 @@ public class MapsService extends Service implements
 
     }
 
-
+    private void startInForeground() {
+        Intent notificationIntent = new Intent(this, MapsActivity.class);
+        PendingIntent pendingIntent=PendingIntent.getActivity(this,0,notificationIntent,0);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,"Notif")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("TEST")
+                .setContentText("HELLO")
+                .setContentIntent(pendingIntent);
+        Notification notification=builder.build();
+        if(Build.VERSION.SDK_INT>=26) {
+            NotificationChannel channel = new NotificationChannel("Notif", "Notification_channel", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Description");
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+        startForeground(NOTIFICATION_ID, notification);
+    }
 
 }

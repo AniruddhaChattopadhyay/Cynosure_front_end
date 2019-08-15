@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Cynosure_1.0</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_route">Map</string>
+    <string name="GOOGLE_KEY" templateMergeStrategy="preserve" translatable="false">AIzaSyDL7zpLLBhXnQdTltFBJ0bwzphysGcZiEE</string>
 </resources>
