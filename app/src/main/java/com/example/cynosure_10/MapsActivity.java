@@ -79,8 +79,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Intent intent = new Intent(this, MapsService.class);
-        startService(intent);
 
         Switch button =  findViewById(R.id.location_switch);
         button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -321,7 +319,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int tag = (Integer) marker.getTag();
             tag = tag +1;
             marker.setTag(tag);
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, InfoActivity.class);
             intent.putExtra("NAME",marker.getTitle());
             intent.putExtra("POSITION",marker.getPosition());
             intent.putExtra("NUMBER", marker.getSnippet());
