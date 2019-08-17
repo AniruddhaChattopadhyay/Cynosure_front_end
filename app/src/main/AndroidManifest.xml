@@ -31,14 +31,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".GroupActivity"></activity>
         <activity
             android:name=".TravelGroups"
             android:label="@string/title_activity_travel_groups"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".SignboardActivity" />
-
         <activity android:name=".InfoActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
