@@ -1,44 +1,87 @@
 package com.example.cynosure_10;
 
-import androidx.fragment.app.FragmentActivity;
-
-import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.SyncStateContract;
 import android.util.Log;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.DirectionsApi;
-import com.google.maps.DirectionsApiRequest;
-import com.google.maps.GeoApiContext;
-import com.google.maps.model.DirectionsLeg;
-import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.DirectionsRoute;
-import com.google.maps.model.DirectionsStep;
-import com.google.maps.model.EncodedPolyline;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+//import com.google.android.libraries.places.api.net.PlacesClient;
 
 public class Route extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private String bus_name;
+    private Marker searchmarker;
+    private final String apiKey = "AIzaSyDL7zpLLBhXnQdTltFBJ0bwzphysGcZiEE";
+
+    FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route);
+
+        Places.initialize(this, apiKey);
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.f_auto_complete);
+
+// Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+// Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                Log.d("KANISHKA",place.getName()+""+place.getLatLng());
+                try {
+                    MarkerOptions options = new MarkerOptions();
+                    options.position(place.getLatLng());
+                    options.title(place.getName());
+                    mMap.addMarker(options);
+                }catch (Exception e){
+                    Log.d("KANISHKA",e.getMessage());
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+
+            }
+        });
+
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        bus_name = getIntent().getStringExtra("BUS NAME");
 
     }
 
@@ -54,23 +97,44 @@ public class Route extends FragmentActivity implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        List<LatLng> markerPoints;
         mMap = googleMap;
 
 
-        LatLng start = new LatLng(22.576178, 88.413661);
-        LatLng way = new LatLng(22.573216, 88.412775);
-        LatLng end = new LatLng(22.570382, 88.412077);
-
-        markerPoints = new ArrayList<>();
-
-        markerPoints.add(start);
-        markerPoints.add(way);
-        markerPoints.add(end);
 
 
-        new Route_Listener(mMap, markerPoints);
+
+
+        firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("BUSES").document(bus_name).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        try {
+                            List<GeoPoint> route = (List<GeoPoint>) documentSnapshot.getData().get("Route");
+                            List<LatLng> markerPoints = new ArrayList<>();
+
+                            for (int i = 0; i < route.size(); i++) {
+                                final int x = i;
+                                LatLng temp;
+                                temp = new LatLng(route.get(x).getLatitude(), route.get(x).getLongitude());
+                                markerPoints.add(temp);
+                            }
+
+
+                            new Route_Listener(mMap, markerPoints);
+                        }
+                        catch (Exception e){
+                            Log.d("KANISHKA",e.getMessage());
+                        }
+                    }
+                });
+
+
 
 
     }
+
+
 }
+

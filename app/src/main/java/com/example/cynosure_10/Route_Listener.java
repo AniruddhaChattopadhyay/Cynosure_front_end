@@ -11,6 +11,7 @@ import com.directions.route.RoutingListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -96,7 +97,14 @@ public class Route_Listener implements RoutingListener {
         options.position(end);
         mmap.addMarker(options);
 
-        mmap.animateCamera(CameraUpdateFactory.newLatLngZoom(start, 17.0f));
+        for (LatLng latLng : way.subList(1,way.size()-1)){
+            options = new MarkerOptions();
+            options.position(latLng);
+            options.icon(BitmapDescriptorFactory.fromResource(R.drawable.img));
+            mmap.addMarker(options);
+        }
+
+        mmap.animateCamera(CameraUpdateFactory.newLatLngZoom(start, 15.0f));
 
     }
 

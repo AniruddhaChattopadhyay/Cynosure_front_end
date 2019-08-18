@@ -2,9 +2,11 @@ package com.example.cynosure_10;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -33,6 +35,15 @@ public class InfoActivity extends AppCompatActivity {
         bus_name.setText(Name);
         bus_number.setText(Number);
         bus_timings.setText(Timings);
+
+        findViewById(R.id.route).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(InfoActivity.this, Route.class);
+                intent.putExtra("BUS NAME", Name);
+                startActivity(intent);
+            }
+        });
 
     }
 }

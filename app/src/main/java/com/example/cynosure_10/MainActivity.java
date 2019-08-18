@@ -12,12 +12,25 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collection;
+
 public class MainActivity extends AppCompatActivity {
+
+    Collection<String> array_of_words_that_begin_with;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Trie trie = new Trie();
+        trie.insert("word");
+        trie.insert("wojjj");
+        trie.insert("jjjwo");
+        trie.insert("lwojjj");
+        array_of_words_that_begin_with = trie.autoComplete("wo");
+        Log.d("KANISHKA",array_of_words_that_begin_with+"");
+
 
         Button mapButton = (Button)findViewById(R.id.mapsactivity);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -34,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.signboard)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SignboardActivity.class);
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                 startActivity(intent);
             }
         });
