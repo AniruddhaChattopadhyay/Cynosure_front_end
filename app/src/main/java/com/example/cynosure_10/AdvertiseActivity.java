@@ -14,6 +14,8 @@ import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
 import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class AdvertiseActivity extends AppCompatActivity {
 
@@ -69,13 +71,19 @@ public class AdvertiseActivity extends AppCompatActivity {
                 .startAdvertising(
                         getBusName(), SERVICE_ID, connectionLifecycleCallback, advertisingOptions)
                 .addOnSuccessListener(
-                        (Void unused) -> {
-                            Log.d("ADVERTISING", "SUCCESS");
-                            Toast.makeText(AdvertiseActivity.this, "STARTED ADVERTISING", Toast.LENGTH_LONG).show();
+                        new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("ADVERTISING", "SUCCESS");
+                                Toast.makeText(AdvertiseActivity.this, "STARTED ADVERTISING", Toast.LENGTH_LONG).show();
+                            }
                         })
                 .addOnFailureListener(
-                        (Exception e) -> {
-                            Log.w("ADVERTISING","FAILURE", e);
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("ADVERTISING", "FAILURE", e);
+                            }
                         });
     }
 }

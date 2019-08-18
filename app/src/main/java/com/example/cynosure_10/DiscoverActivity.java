@@ -20,6 +20,8 @@ import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.google.android.gms.nearby.connection.DiscoveryOptions;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class DiscoverActivity extends AppCompatActivity {
     private static final Strategy STRATEGY = Strategy.P2P_STAR;
@@ -101,13 +103,19 @@ public class DiscoverActivity extends AppCompatActivity {
                         Nearby.getConnectionsClient(getApplicationContext())
                                 .requestConnection(getUserName(), endpointId, connectionLifecycleCallback)
                                 .addOnSuccessListener(
-                                        (Void unused) -> {
-                                            // We successfully requested a connection. Now both sides
-                                            // must accept before the connection is established.
+                                        new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                // We successfully requested a connection. Now both sides
+                                                // must accept before the connection is established.
+                                            }
                                         })
                                 .addOnFailureListener(
-                                        (Exception e) -> {
-                                            // Nearby Connections failed to request the connection.
+                                        new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                // Nearby Connections failed to request the connection.
+                                            }
                                         });
                     }
 
@@ -121,13 +129,19 @@ public class DiscoverActivity extends AppCompatActivity {
         Nearby.getConnectionsClient(getApplicationContext())
                 .startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
-                        (Void unused) -> {
-                            Log.d("DISCOVER","SUCCESS");
-                            Toast.makeText(DiscoverActivity.this, "STARTED DISCOVERING", Toast.LENGTH_LONG).show();
+                        new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("DISCOVER", "SUCCESS");
+                                Toast.makeText(DiscoverActivity.this, "STARTED DISCOVERING", Toast.LENGTH_LONG).show();
+                            }
                         })
                 .addOnFailureListener(
-                        (Exception e) -> {
-                            Log.w("DISCOVER","FAILURE", e);
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("DISCOVER", "FAILURE", e);
+                            }
                         });
     }
 }
