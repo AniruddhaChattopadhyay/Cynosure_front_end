@@ -59,5 +59,21 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        ((Button)findViewById(R.id.startAdvertise)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AdvertiseActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        ((Button)findViewById(R.id.startDiscover)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DiscoverActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
