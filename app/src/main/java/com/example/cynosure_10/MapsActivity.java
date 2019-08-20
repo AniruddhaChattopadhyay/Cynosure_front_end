@@ -142,11 +142,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
-
-
-
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -268,7 +263,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mCurrent.remove();
             Log.d("KANISHKA","Location = "+ latitude + "   "+ longitude);
             //Updating to Firebase
-            geoFire.setLocation("Test", new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+            geoFire.setLocation(phone, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
                 @Override
                 public void onComplete(String key, DatabaseError error) {
                     if(mCurrent != null)

@@ -31,14 +31,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SearchActivity"></activity>
-        <activity android:name=".GroupActivity" />
-        <activity
-            android:name=".TravelGroups"
-            android:label="@string/title_activity_travel_groups"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".SignboardActivity" />
-        <activity android:name=".InfoActivity" />
+        <activity android:name=".Directions"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -52,6 +45,17 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".Group_Locations"
+            android:label="@string/title_activity_group__locations" />
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".GroupActivity" />
+        <activity
+            android:name=".TravelGroups"
+            android:label="@string/title_activity_travel_groups"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SignboardActivity" />
+        <activity android:name=".InfoActivity" />
+        <activity
             android:name=".Route"
             android:label="@string/title_activity_route" />
 
@@ -63,13 +67,7 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".MainActivity"></activity>
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
@@ -78,6 +76,14 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".Login_Activity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

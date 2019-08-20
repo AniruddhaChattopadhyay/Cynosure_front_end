@@ -46,6 +46,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.paperdb.Paper;
+
 import static android.content.ContentValues.TAG;
 
 public class InvitesFragment extends Fragment {
@@ -58,6 +60,7 @@ public class InvitesFragment extends Fragment {
     public static InvitesFragment newInstance(int index, Context contextL, ArrayList<String> groupInvites) {
         context = contextL;
         InvitesFragment fragment = new InvitesFragment();
+        Paper.init(contextL);
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_SECTION_NUMBER, index);
         fragment.setArguments(bundle);
@@ -71,6 +74,8 @@ public class InvitesFragment extends Fragment {
         Log.d("TAB","INVITE");
         Log.d("TAB INFO", getArguments().getInt(ARG_SECTION_NUMBER)+"");
 
+
+
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
         int index = 1;
         if (getArguments() != null) {
@@ -80,14 +85,19 @@ public class InvitesFragment extends Fragment {
     }
 
     private String userLogin(){
-        return "8777651851";
+        String a = Paper.book().read("PHONE");
+        return a;
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final ArrayAdapter<String> listenadapter = new ArrayAdapter<>(context, R.layout.listdata , groups);
+        final ArrayAdapter<String> listenadapter;
+        if (groups != null && groups.size() !=0)
+            listenadapter = new ArrayAdapter<>(context, R.layout.listdata , groups);
+        else
+            listenadapter = new ArrayAdapter<>(context,R.layout.listdata);
         View view = inflater.inflate(R.layout.invites,container,false);
         ListView listView = (ListView) view.findViewById(R.id.inviteList);
         listView.setAdapter(listenadapter);
@@ -192,6 +202,17 @@ public class InvitesFragment extends Fragment {
                                 }
                             }
                         });
+
+                        Map<String, Object> docData2 = new HashMap<>();
+                        docData2.put("Groups",FieldValue.arrayUnion(grpName) );
+                        DocumentReference doc = db.collection("CUSTOMERS").document((String) Paper.book().read("PHONE"));
+                        doc.update(docData2)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("KANISHKA",grpName);
+                                    }
+                                });
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

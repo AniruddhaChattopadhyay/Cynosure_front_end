@@ -23,6 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.paperdb.Paper;
+
 public class RegisterActivity extends AppCompatActivity {
 
 

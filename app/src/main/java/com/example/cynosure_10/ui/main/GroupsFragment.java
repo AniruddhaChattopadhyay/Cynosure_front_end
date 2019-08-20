@@ -28,6 +28,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+import io.paperdb.Paper;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -42,6 +44,7 @@ public class GroupsFragment extends Fragment {
         GroupsFragment fragment = new GroupsFragment();
         groups = groupInvites;
         context = contextL;
+        Paper.init(context);
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_SECTION_NUMBER, index);
         fragment.setArguments(bundle);
@@ -52,6 +55,7 @@ public class GroupsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel.class);
         int index = 1;
         if (getArguments() != null) {
@@ -61,14 +65,19 @@ public class GroupsFragment extends Fragment {
     }
 
     private String userLogin(){
-        return "8777651851";
+        String a = Paper.book().read("PHONE");
+        return a;
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final ArrayAdapter<String> listenadapter = new ArrayAdapter<>(context, R.layout.listdata , groups);
+        final ArrayAdapter<String> listenadapter;
+        if (groups != null && groups.size() !=0)
+            listenadapter = new ArrayAdapter<>(context, R.layout.listdata , groups);
+        else
+            listenadapter = new ArrayAdapter<>(context,R.layout.listdata);
         View view = inflater.inflate(R.layout.groups,container,false);
         final ListView listView = (ListView) view.findViewById(R.id.showGroups);
         listView.setAdapter(listenadapter);

@@ -32,6 +32,8 @@ import com.google.firebase.firestore.Source;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import io.paperdb.Paper;
+
 public class TravelGroups extends AppCompatActivity {
 
     private ArrayList<String> groupInvites;
@@ -40,12 +42,16 @@ public class TravelGroups extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Paper.init(this);
         setContentView(R.layout.activity_travel_groups);
+        groupInvites = new ArrayList<>();
+        groupList = new ArrayList<>();
         getFirebaseData();
     }
 
     private String userLogin() {
-        return "8777651851";
+        String phone =  Paper.book().read("PHONE");
+        return phone;
     }
 
     private void getFirebaseData() {
@@ -57,10 +63,15 @@ public class TravelGroups extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    Log.d("SUCCESS", "Cached document data: " + document.getData());
-                    groupInvites = (ArrayList<String>) document.getData().get("invites");
-                    groupList = (ArrayList<String>) document.getData().get("Groups");
+                    try {
+                        Log.d("SUCCESS", "Cached document data: " + document.getData());
+                        groupInvites = (ArrayList<String>) document.getData().get("invites");
+                        groupList = (ArrayList<String>) document.getData().get("Groups");
+                    }catch (Exception e){
+                        Log.d("KANISHKA",e.getMessage());
+                    }
                     callData();
+
                 } else {
                     Log.d("FAILURE", "Cached get failed: ", task.getException());
                 }

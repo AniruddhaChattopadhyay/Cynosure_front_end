@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -34,14 +35,18 @@ import java.util.Map;
 
 public class GroupActivity extends AppCompatActivity {
     private ArrayList<String> groupMembers;
+    private ArrayList<String> groupMembers2;
+    private Button ViewLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
+        ViewLocation = findViewById(R.id.view_location);
         final String grpName = (String) getIntent().getStringExtra("GroupName");
-        Log.d("GRP ACTIVIT", grpName);
+        Log.d("GRP ACTIVITY", grpName);
         groupMembers = new ArrayList<>();
+        groupMembers2 = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("CUSTOMERS").whereArrayContains("Groups", grpName)
                 .get()
@@ -50,8 +55,9 @@ public class GroupActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("DATA", document.getId() + " => " + document.getData());
+                                Log.d("KANISHKA", document.getId() + " => " + document.getData());
                                 groupMembers.add((String) document.getData().get("name"));
+                                groupMembers2.add((String) document.getId());
                             }
                             createList();
                         } else {
@@ -59,6 +65,15 @@ public class GroupActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        ViewLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupActivity.this,Group_Locations.class);
+                intent.putExtra("MEMBERS", groupMembers2);
+                startActivity(intent);
+            }
+        });
 
         final Button addMember = (Button)findViewById(R.id.addMember);
         addMember.setOnClickListener(new View.OnClickListener() {

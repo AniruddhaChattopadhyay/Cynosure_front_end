@@ -7,4 +7,5 @@
     <string name="title_activity_travel_groups">TravelGroups</string>
     <string name="tab_text_1">Groups</string>
     <string name="tab_text_2">Invites</string>
+    <string name="title_activity_group__locations">Map</string>
 </resources>
