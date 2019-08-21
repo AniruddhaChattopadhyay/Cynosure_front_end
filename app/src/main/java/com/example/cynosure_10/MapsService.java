@@ -1,12 +1,14 @@
 package com.example.cynosure_10;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -50,9 +52,11 @@ import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import io.paperdb.Paper;
 
@@ -282,8 +286,24 @@ public class MapsService extends Service implements
         endpointDiscoveryCallback =
                 new EndpointDiscoveryCallback() {
                     @Override
-                    public void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info) {
+                    public void onEndpointFound(@NonNull String endpointId, @NonNull final DiscoveredEndpointInfo info) {
                         Log.d("DISCOVERED", info.getEndpointName());
+                        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+                        DatabaseReference databaseReference = firebaseDatabase.getReference("Drivers").child(info.getEndpointName())
+                                .child("Bus Name");
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                String number = dataSnapshot.getValue(String.class);
+                                showAlertBox(info.getEndpointName(),number);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
                     }
 
                     @Override
@@ -310,6 +330,49 @@ public class MapsService extends Service implements
                             }
                         });
 
+    }
+
+    private void showAlertBox(final String bus_number, String number){
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Yes button clicked
+                        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Drivers").child(bus_number).child("Crowd");
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Integer crowd;
+                                try {
+                                    crowd= dataSnapshot.getValue(Integer.class);
+                                } catch (Exception e) {
+                                    crowd = 0;
+                                }
+                                if (crowd == null)
+                                    crowd =0;
+
+                                crowd++;
+                                ref.setValue(crowd);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you on this bus: \n" + bus_number+":"+" "+number).setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
     }
 
 }
