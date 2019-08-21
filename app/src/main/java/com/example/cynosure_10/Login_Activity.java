@@ -116,7 +116,7 @@ public class Login_Activity extends AppCompatActivity {
                                             Paper.book().write("PASSWORD", actual_psswd);
                                         Toast.makeText(Login_Activity.this, "Logging in", Toast.LENGTH_SHORT).show();
                                         loadingbar.dismiss();
-                                        Intent intent = new Intent(Login_Activity.this, MapsActivity.class);
+                                        Intent intent = new Intent(Login_Activity.this, MainActivity.class);
                                         startActivity(intent);
                                     } else {
                                         loadingbar.dismiss();
@@ -138,75 +138,5 @@ public class Login_Activity extends AppCompatActivity {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
-        /**RootRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String care = dataSnapshot.child(parentDbName).child(phone).child("Caregiver").getValue(String.class);
-                String name = dataSnapshot.child(parentDbName).child(phone).child("name").getValue(String.class);
-                Paper.book().write(Prevalent.careGiver,care);
-                Paper.book().write(Prevalent.name,name);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        Paper.book().write(Prevalent.userPhone,phone);
-        if (chkb_remember_me.isChecked())
-        {
-            Paper.book().write(Prevalent.userPassword,password);
-        }
-
-
-
-        RootRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
-            {
-                if(dataSnapshot.child(parentDbName).child(phone).exists())
-                {
-                    Users userData = dataSnapshot.child(parentDbName).child(phone).getValue(Users.class);
-
-                    if(userData.getPhone().equals(phone))
-                    {
-                        if (userData.getPassword().equals(password))
-                        {
-                            String userCaregiver = Paper.book().read(Prevalent.careGiver);
-                            if (userCaregiver == "")
-                                Paper.book().write(Prevalent.careGiver,userData.getCaregiver());
-
-                            Toast.makeText(Login_Activity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                            loadingbar.dismiss();
-
-                            //Intent intent1 = new Intent(Login_Activity.this, Accelerometer_data.class);
-                            //startService(intent1);
-
-                            Intent intent = new Intent(Login_Activity.this,MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        }
-                        else
-                        {
-                            Toast.makeText(Login_Activity.this, "Password is incorrect.", Toast.LENGTH_SHORT).show();
-                            loadingbar.dismiss();
-                            Toast.makeText(Login_Activity.this, "Please try again.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-                else
-                {
-                    Toast.makeText(Login_Activity.this, "Account with this Phnoe Number is not Registered.", Toast.LENGTH_SHORT).show();
-                    loadingbar.dismiss();
-                    Toast.makeText(Login_Activity.this, "Please retry valid Login Credentials.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });**/
     }
 }

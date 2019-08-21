@@ -23,14 +23,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Trie trie = new Trie();
-        trie.insert("word");
-        trie.insert("wojjj");
-        trie.insert("jjjwo");
-        trie.insert("lwojjj");
-        array_of_words_that_begin_with = trie.autoComplete("wo");
-        Log.d("KANISHKA",array_of_words_that_begin_with+"");
-
 
         Button mapButton = (Button)findViewById(R.id.mapsactivity);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -47,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.signboard)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                Intent intent = new Intent(MainActivity.this, Directions.class);
                 startActivity(intent);
             }
         });

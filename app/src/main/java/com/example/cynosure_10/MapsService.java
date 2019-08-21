@@ -43,6 +43,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import io.paperdb.Paper;
+
 public class MapsService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -66,6 +68,8 @@ public class MapsService extends Service implements
     DatabaseReference drivers;
     GeoFire geoFire;
 
+    private String phone;
+
     Marker mCurrent;
 
 
@@ -76,8 +80,10 @@ public class MapsService extends Service implements
     @Override
     public void onCreate() {
         startInForeground();
+        Paper.init(this);
+        phone = Paper.book().read("PHONE");
 
-        drivers = FirebaseDatabase.getInstance().getReference("Test");
+        drivers = FirebaseDatabase.getInstance().getReference("Customers");
         geoFire = new GeoFire(drivers);
 
         String id = drivers.push().getKey();
@@ -185,7 +191,7 @@ public class MapsService extends Service implements
 
             Log.d("KANISHKA","Location Service = "+ latitude + "   "+ longitude);
             //Updating to Firebase
-            geoFire.setLocation("You", new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+            geoFire.setLocation(phone, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
                 @Override
                 public void onComplete(String key, DatabaseError error) {
 
