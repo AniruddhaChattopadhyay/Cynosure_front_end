@@ -16,7 +16,6 @@ import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
 
-    Collection<String> array_of_words_that_begin_with;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
