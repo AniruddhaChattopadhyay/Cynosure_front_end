@@ -42,4 +42,26 @@
         android:layout_marginRight="40dp"
         android:layout_marginBottom="40dp"
         android:text="Travel Groups" />
+    <Button
+        android:id="@+id/news"
+        android:layout_width="321dp"
+        android:layout_height="67dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="350dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="News"/>
+    <Button
+        android:id="@+id/pie"
+        android:layout_width="321dp"
+        android:layout_height="67dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="450dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="Save The World"/>
 </RelativeLayout>

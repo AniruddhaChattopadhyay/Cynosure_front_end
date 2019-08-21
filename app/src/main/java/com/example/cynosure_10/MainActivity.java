@@ -59,5 +59,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        ((Button)findViewById(R.id.news)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,NewsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        ((Button)findViewById(R.id.pie)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,PieChartActivity1.class);
+                startActivity(intent);
+            }
+        });
     }
 }
