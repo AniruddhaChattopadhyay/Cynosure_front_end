@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.provider.DocumentsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -53,6 +54,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -81,6 +83,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static int FASTEST_INTERVAL = 10;
     private static int DISPLACEMENT = 1;
 
+    private String BUS_NUMBER;
+
     private FirebaseFirestore firestore;
 
     private AutoCompleteTextView searchView;
@@ -89,7 +93,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int count = 0;
     private ArrayList<String> buses;
     private List<Marker> markerArrayList = new ArrayList<>();
-
+    private ArrayList<String> bus_list = new ArrayList<>();
+    private ArrayList<String> bus_filtered = new ArrayList<>();
     private double temp_lat;
     private double temp_lon;
     private String temp_name;
@@ -113,11 +118,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        suggest_list = new ArrayList<>();
 
         searchView = (AutoCompleteTextView) findViewById(R.id.search);
 
-        Log.d("KANISHKA", suggest_list+"");
+        try {
+            BUS_NUMBER = getIntent().getStringExtra("FILTER");
+            Log.d("KANISHA_TEST",BUS_NUMBER);
+        } catch (Exception e) {
+            Log.d("KANISHKA", "No buses selecter. Showing all buses.");
+        }
+
+
+        bus_filtered = new ArrayList<>();
 
 
 
@@ -172,8 +184,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         driver = FirebaseDatabase.getInstance().getReference("Drivers");
         geoFire = new GeoFire(customer);
 
-        String id = customer.push().getKey();
-        Log.d("KANISHKA","ID:  " + id);
 
         setupLocation();
     }
@@ -259,26 +269,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final double latitude = mLastLocation.getLatitude();
             final double longitude = mLastLocation.getLongitude();
 
-            if(mCurrent != null)
-                mCurrent.remove();
             Log.d("KANISHKA","Location = "+ latitude + "   "+ longitude);
             //Updating to Firebase
             geoFire.setLocation(phone, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
                 @Override
                 public void onComplete(String key, DatabaseError error) {
-                    if(mCurrent != null)
-                        mCurrent.remove();
                     Log.d("KANISHKA","mCurrent");
+                    if(mCurrent != null)
+                        mCurrent.setPosition(new LatLng(latitude,longitude));
+                    else {
                     mCurrent = mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude,longitude))
                             .title("You"));
                     mCurrent.setTag(0);
+                    }
                     if (count==0)
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15.0f));
 
                 }
             });
             if (count%20==0) {
+
+                if (BUS_NUMBER != null) {
+
+                    firestore = FirebaseFirestore.getInstance();
+                    firestore.collection("BUSES").document(BUS_NUMBER).collection("buses").get()
+                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                                        bus_list.add(documentSnapshot.getId());
+                                    }
+                                }
+                            });
+                }
 
                 driver.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -294,8 +318,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 double distanceInKiloMeters = (mLastLocation.distanceTo(targetLocation)) / 1000; // as distance is in meter
 
-                                if (distanceInKiloMeters <= 1000) {
-                                    // It is in range of 1 km
+                                if (distanceInKiloMeters <= 100) {
+                                    // It is in range of 100 km
                                     buses.add(snapshot.getKey());
                                     Log.d("KANISHKA", "test:  " + snapshot.getKey());
                                 }
@@ -315,13 +339,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             count++;
 
-
+            if (buses.size()>0 && bus_list.size()>0 && bus_filtered.size() == 0){
+                bus_filtered =  intersection(bus_list,buses);
+                Log.d("KANISHKA_TEST", ""+bus_filtered);
+            }
+            else
+                Log.d("KANISHKA_TEST",buses.size()+"  "+bus_list.size());
 
 
         }
         else
             Log.d("MAP","error");
 
+    }
+
+    public <T> ArrayList<T> intersection(ArrayList<T> list1, ArrayList<T> list2) {
+        ArrayList<T> list = new ArrayList<T>();
+
+        for (T t : list1) {
+            if(list2.contains(t)) {
+                list.add(t);
+            }
+        }
+
+        return list;
     }
 
     private void rotateMarker(final Marker mCurrent, final float i, GoogleMap mMap) {
@@ -402,9 +443,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (buses.size()>0){
             latlngs.clear();
             names.clear();
+            ArrayList<String> bus;
+            if (bus_filtered.size() != 0){
+                bus = bus_filtered;
+            }
+            else {
+                bus = buses;
+            }
             Log.d("KANISHKA",markerArrayList.size() + "");
-            for (int i = 0; i < buses.size(); i++) {
-                String number = buses.get(i);
+            for (int i = 0; i < bus.size(); i++) {
+                String number = bus.get(i);
                 final int x = i;
                 Log.d("KANISHKA","Number:  "+number);
                 driver.child(number).addValueEventListener(new ValueEventListener() {
@@ -435,7 +483,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             }
-            Log.d("KANISHKA"," "+  names  +  latlngs);
 //            for (int i=0;i<latlngs.size();i++) {
 //                options.position(latlngs.get(i));
 //                options.title(names.get(i));
@@ -452,6 +499,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         displayLocation();
+        displaybuses();
         startLocationUpdates();
     }
 
